@@ -6,19 +6,20 @@
 /*   By: gcros <gcros@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/17 20:27:06 by gcros             #+#    #+#             */
-/*   Updated: 2024/01/25 18:19:09 by gcros            ###   ########.fr       */
+/*   Updated: 2024/01/30 17:52:38 by gcros            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#define _XOPEN_SOURCE 700
+
 #include <unistd.h>
-#include <stdlib.h>
+#include <signal.h>
 #include "server.h"
+#include <stdlib.h>
 
-void	ft_fill_byte(int bit);
-int		ft_fill_string();
-int		ft_expend(void);
-
-extern t_message *g_client_message;
+int	ft_fill_byte(int bit, t_byte *byte);
+int	ft_fill_string();
+int	ft_expend(t_message *message);
 
 t_message	*ft_init_message(int from)
 {
@@ -30,8 +31,7 @@ t_message	*ft_init_message(int from)
 	message->message = malloc(sizeof(t_byte)*10);
 	if (message->message == NULL)
 		return (free(message), NULL);
-	message->byte = 0;
-	message->byte_cursor = 0;
+	message->message[0] = '\0';
 	message->from = from;
 	message->message_len = 10;
 	message->message_cursor = 0;
@@ -39,54 +39,63 @@ t_message	*ft_init_message(int from)
 }
 
 
-int	ft_receive(int sig)
+int	ft_receive(int sig, pid_t pid, t_message *message)
 {
-	ft_fill_byte(sig == SIGUSR1);
-	if (g_client_message->byte_cursor == 8)
-		return (ft_fill_string());
-	return (0);
-}
-
-void	ft_fill_byte(int bit)
-{
-	if (g_client_message->byte_cursor < 8)
+	int					ret;
+	
+	if (ft_fill_byte(sig == SIGUSR1, &message->message[message->message_cursor]))
 	{
-		g_client_message->byte <<= 1;
-		g_client_message->byte += bit;
-		g_client_message->byte_cursor++;
-	}
-}
-
-int	ft_fill_string(void)
-{
-	if (g_client_message->byte == 0)
-		return (1);
-	if (g_client_message->message_cursor == g_client_message->message_len)
-		if (ft_expend() == -1)
+		if (message->message[message->message_cursor] == '\0')
+		{
+			ret = write(1, message->message, message->message_cursor);
+			if (ret == -1)
+				exit(-1);
+			return (1);
+		}
+		message->message_cursor++;
+		if (message->message_cursor == message->message_len)
+		if (ft_expend(message) == -1)
 			return (-1);
-	g_client_message->message[g_client_message->message_cursor] = g_client_message->byte;
-	g_client_message->message_cursor++;
-	g_client_message->byte_cursor = 0;
+		message->message[message->message_cursor] = '\0';
+	}
 	return (0);
 }
 
-int	ft_expend(void)
+int	ft_fill_byte(int bit, t_byte *byte)
+{
+	static int	cursor;
+
+	if (cursor < 8)
+	{
+		*byte <<= 1;
+		*byte += bit;
+		cursor++;
+	}
+	if (cursor == 8)
+	{
+		cursor = 0;
+		return (1);
+	}
+	return (0);
+}
+
+int	ft_expend(t_message *message)
 {
 	t_byte	*nbuf;
 	size_t	i;
 
-	nbuf = malloc(g_client_message->message_len + 10);
+	nbuf = malloc(message->message_len + 1000);
 	if (nbuf == NULL)
 		return (-1);
 	i = 0;
-	while (i < g_client_message->message_len)
+	while (i < message->message_len)
 	{
-		nbuf[i] = g_client_message->message[i];
+		nbuf[i] = message->message[i];
 		i++;
 	}
 	nbuf[i] = '\0';
-	free(g_client_message->message);
-	g_client_message->message = nbuf;
-	g_client_message->message_len += 10;
+	free(message->message);
+	message->message = nbuf;
+	message->message_len += 1000;
 	return (1);
 }

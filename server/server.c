@@ -6,7 +6,7 @@
 /*   By: gcros <gcros@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/17 20:22:31 by gcros             #+#    #+#             */
-/*   Updated: 2024/01/26 01:04:27 by gcros            ###   ########.fr       */
+/*   Updated: 2024/01/30 17:10:06 by gcros            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,6 @@
 #include "server.h"
 
 void	ft_putnbr(int n);
-
-extern t_message *g_client_message;
 
 int main(int ac, char **av)
 {
