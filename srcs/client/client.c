@@ -6,11 +6,11 @@
 /*   By: gcros <gcros@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/18 00:28:40 by gcros             #+#    #+#             */
-/*   Updated: 2024/01/30 23:21:03 by gcros            ###   ########.fr       */
+/*   Updated: 2024/01/31 00:32:52 by gcros            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-# define _XOPEN_SOURCE 700
+#define _XOPEN_SOURCE 700
 #include "client.h"
 #include <limits.h>
 #include <signal.h>
@@ -19,14 +19,14 @@
 #include <stdlib.h>
 
 int	ft_send_str(char *str, int pid);
-int ft_send_byte(t_byte byte, int pid);
+int	ft_send_byte(t_byte byte, int pid);
 int	ft_strisnumber(const char *s);
 int	ft_atoi(const char *nptr);
 
 int	main(int ac, char **av)
 {
 	int	pid;
-	
+
 	ft_client_init();
 	if (ac != 3)
 		return (1);
@@ -36,7 +36,7 @@ int	main(int ac, char **av)
 	if (pid < 0)
 		return (2);
 	if (kill(pid, 0) == -1)
-		exit(-1);
+		exit(-2);
 	return (ft_send_str(av[2], pid));
 }
 
@@ -52,19 +52,19 @@ int	ft_send_str(char *str, int pid)
 		i++;
 	}
 	if (ft_send_byte('\0', pid) == -1)
-			return (-1);
+		return (-1);
 	return (0);
 }
 
-int ft_send_byte(t_byte byte, int pid)
+int	ft_send_byte(t_byte byte, int pid)
 {
 	int	bit_shift;
 
 	bit_shift = 7;
-	//printf("send byte %c\n", byte);
 	while (bit_shift >= 0)
 	{
-		ft_send_bit((byte >> bit_shift) & 1, pid);
+		if (ft_send_bit((byte >> bit_shift) & 1, pid) == -1)
+			return (-1);
 		if (get_feedback() == SIGUSR2)
 			return (-1);
 		bit_shift--;

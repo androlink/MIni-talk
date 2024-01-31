@@ -6,7 +6,7 @@
 /*   By: gcros <gcros@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/17 20:22:31 by gcros             #+#    #+#             */
-/*   Updated: 2024/01/30 22:38:28 by gcros            ###   ########.fr       */
+/*   Updated: 2024/01/31 00:55:56 by gcros            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 
 void	ft_putnbr(int n);
 
-int main(int ac, char **av)
+int	main(int ac, char **av)
 {
 	(void)av;
 	if (ac != 1)
@@ -24,9 +24,7 @@ int main(int ac, char **av)
 	ft_putnbr(getpid());
 	write(1, "\n", 1);
 	while (1)
-	{
 		pause();
-	}
 }
 
 void	ft_putnbr(int n)

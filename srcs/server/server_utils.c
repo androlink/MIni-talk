@@ -6,7 +6,7 @@
 /*   By: gcros <gcros@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/17 20:27:06 by gcros             #+#    #+#             */
-/*   Updated: 2024/01/30 23:23:12 by gcros            ###   ########.fr       */
+/*   Updated: 2024/01/31 00:57:32 by gcros            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,9 +24,12 @@ t_message	*ft_init_message(int from)
 	message = malloc(sizeof(t_message));
 	if (message == NULL)
 		return (NULL);
-	message->message = malloc(sizeof(t_byte)*BUFFER_SIZE);
+	message->message = malloc(sizeof(t_byte) * BUFFER_SIZE);
 	if (message->message == NULL)
-		return (free(message), NULL);
+	{
+		free(message);
+		return (NULL);
+	}
 	message->message[0] = '\0';
 	message->from = from;
 	message->message_len = 10;
@@ -34,12 +37,12 @@ t_message	*ft_init_message(int from)
 	return (message);
 }
 
-
 int	ft_receive(int sig, t_message *message)
 {
 	int	ret;
-	
-	if (ft_fill_byte(sig == SIGUSR1, &message->message[message->message_cursor]))
+
+	if (ft_fill_byte(sig == SIGUSR1,
+			&message->message[message->message_cursor]))
 	{
 		if (message->message[message->message_cursor] == '\0')
 		{
@@ -50,8 +53,8 @@ int	ft_receive(int sig, t_message *message)
 		}
 		message->message_cursor++;
 		if (message->message_cursor == message->message_len)
-		if (ft_expend(message) == -1)
-			return (-1);
+			if (ft_expend(message) == -1)
+				return (-1);
 		message->message[message->message_cursor] = '\0';
 	}
 	return (0);

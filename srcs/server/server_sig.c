@@ -6,26 +6,25 @@
 /*   By: gcros <gcros@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/17 20:22:32 by gcros             #+#    #+#             */
-/*   Updated: 2024/01/30 23:20:43 by gcros            ###   ########.fr       */
+/*   Updated: 2024/01/31 00:59:55 by gcros            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-# define _XOPEN_SOURCE 700
+#define _XOPEN_SOURCE 700
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "server.h"
 
-void    get_pid(int sig, siginfo_t *info, void *context);
-void    ft_signal_handler(int sig, siginfo_t *info, void *context);
+void	get_pid(int sig, siginfo_t *info, void *context);
+void	ft_signal_handler(int sig, siginfo_t *info, void *context);
 
-void	ft_server_init()
+void	ft_server_init(void)
 {
 	static t_sigaction	sa = {0};
-	
+
 	sa.sa_flags = SA_SIGINFO;
 	sa.sa_sigaction = ft_signal_handler;
-
 	if (sigaction(SIGUSR1, &sa, NULL) < 0
 		|| sigaction(SIGUSR2, &sa, NULL) < 0)
 		exit(-2);
@@ -39,7 +38,7 @@ int	ft_send_sig(int sig, int pid)
 int	resolve_message(int sig, pid_t pid)
 {
 	static t_message	*message;
-	int	ret;
+	int					ret;
 
 	if (pid == 0)
 	{
@@ -64,7 +63,7 @@ int	resolve_message(int sig, pid_t pid)
 	return (ret);
 }
 
-void    ft_signal_handler(int sig, siginfo_t *info, void *context)
+void	ft_signal_handler(int sig, siginfo_t *info, void *context)
 {
 	(void) context;
 	if (resolve_message(sig, info->si_pid) == -1)
