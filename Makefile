@@ -1,6 +1,9 @@
 CLIENT_NAME = client
 SERVER_NAME = server
 
+CLIENT_NAME_BONUS = client_bonus
+SERVER_NAME_BONUS = server_bonus
+
 CC = cc
 RMF = rm -f
 
@@ -33,6 +36,14 @@ SERVER_DEPS = $(SERVER_PATH:%.c=$(DDIR)/%.d)
 
 all : $(CLIENT_NAME) $(SERVER_NAME)
 
+bonus: $(CLIENT_NAME_BONUS) $(SERVER_NAME_BONUS)
+
+$(CLIENT_NAME_BONUS) : $(CLIENT_OBJS)
+	$(CC) $(CFLAGS) -o $@ $(CLIENT_OBJS) -I $(HDIR)/
+
+$(SERVER_NAME_BONUS) : $(SERVER_OBJS)
+	$(CC) $(CFLAGS) -o $@ $(SERVER_OBJS) -I $(HDIR)/
+
 $(CLIENT_NAME) : $(CLIENT_OBJS)
 	$(CC) $(CFLAGS) -o $@ $(CLIENT_OBJS) -I $(HDIR)/
 
@@ -46,7 +57,7 @@ $(BDIR)/%.o	:	$(SDIR)/%.c
 	$(CC) $(CFLAGS) $(DFLAGS) -c $< -o $@ -I $(HDIR)/
 
 fclean	:	clean
-	rm -f $(SERVER_NAME) $(CLIENT_NAME)
+	rm -f $(SERVER_NAME) $(CLIENT_NAME) $(CLIENT_NAME_BONUS) $(SERVER_NAME_BONUS)
 
 clean:
 	rm -f $(CLIENT_OBJS) $(SERVER_OBJS) $(SERVER_DEPS) $(CLIENT_DEPS)
